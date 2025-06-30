@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Underground Lair - Tickets</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000000;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background-color: #000000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #cccccc;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .tickets-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .ticket-form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            width: 100%;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        input {
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            background-color: #3a3a3a;
+            color: white;
+        }
+
+        input:focus {
+            outline: 2px solid white;
+            background-color: #4a4a4a;
+        }
+
+        .generate-button {
+            background-color: white;
+            color: black;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: 2px solid white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .generate-button:hover {
+            background-color: black;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .logos {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .logo-img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-img:hover {
+            transform: scale(1.1);
+        }
+
+        footer {
+            background-color: #000000;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Underground Lair</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="tickets.html">Tickets</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="tickets-content">
+            <h1>Generate Your Ticket</h1>
+            
+            <form id="ticketForm" class="ticket-form">
+                <div class="form-group">
+                    <label for="name">Enter Name:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Enter Email Address:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <button type="submit" class="generate-button">Generate Ticket</button>
+            </form>
+            
+            <div class="logos">
+                <img src="rig1.webp" alt="Rig 1" class="logo-img">
+                <img src="rig2.webp" alt="Rig 2" class="logo-img">
+                <img src="rig3.webp" alt="Rig 3" class="logo-img">
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Underground Lair. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        document.getElementById('ticketForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            
+            if (name && email) {
+                generatePDF(name, email);
+            }
+        });
+        
+        function generatePDF(name, email) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Set background to black
+            doc.setFillColor(0, 0, 0);
+            doc.rect(0, 0, 210, 297, 'F');
+            
+            // Set text color to white
+            doc.setTextColor(255, 255, 255);
+            
+            // Title
+            doc.setFontSize(24);
+            doc.setFont(undefined, 'bold');
+            doc.text('UNDERGROUND LAIR', 105, 40, { align: 'center' });
+            
+            doc.setFontSize(18);
+            doc.text('ENTRY TICKET', 105, 55, { align: 'center' });
+            
+            // Ticket details
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'normal');
+            
+            const ticketId = Math.random().toString(36).substr(2, 9).toUpperCase();
+            const date = new Date().toLocaleDateString();
+            
+            doc.text(`Name: ${name}`, 30, 90);
+            doc.text(`Email: ${email}`, 30, 110);
+            doc.text(`Date: ${date}`, 30, 130);
+            doc.text(`Ticket ID: ${ticketId}`, 30, 150);
+            
+            // Instructions
+            doc.setFontSize(12);
+            doc.text('This ticket grants you access to the Underground Lair.', 30, 180);
+            doc.text('Present this ticket at the entrance.', 30, 195);
+            
+            // Add border
+            doc.setDrawColor(255, 255, 255);
+            doc.setLineWidth(2);
+            doc.rect(20, 20, 170, 250);
+            
+            // Save the PDF
+            const filename = `underground-lair-ticket-${name.replace(/\s+/g, '-').toLowerCase()}.pdf`;
+            doc.save(filename);
+            
+            alert('PDF ticket generated and downloaded!');
+        }
+    </script>
+</body>
+</html>

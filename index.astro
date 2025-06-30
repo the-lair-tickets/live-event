@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Underground Lair</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000000;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background-color: #000000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #cccccc;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .home-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .main-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .enter-button {
+            background-color: white;
+            color: black;
+            padding: 15px 30px;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 2px solid white;
+        }
+
+        .enter-button:hover {
+            background-color: black;
+            color: white;
+            border: 2px solid white;
+        }
+
+        footer {
+            background-color: #000000;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Underground Lair</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="tickets.html">Tickets</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="home-content">
+            <img src="mainpic.webp" alt="Underground Lair" class="main-image">
+            <a href="tickets.html" class="enter-button">Click to Enter</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Underground Lair. All rights reserved.</p>
+    </footer>
+</body>
+</html>

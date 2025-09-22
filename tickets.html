@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" type="image/x-icon" href="public/favicon.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Underground Lair - Tickets</title>
+    <title>Underground Lair Ticket Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -24,29 +26,144 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 40px;
+            padding: 15px 20px;
             background-color: #000000;
+            position: relative;
+            z-index: 100;
         }
 
         .logo {
-            font-size: 24px;
+            font-size: clamp(18px, 4vw, 28px);
             font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
         }
 
-        nav {
+        .logo:hover {
+            animation: glow 2s infinite;
+            transform: scale(1.05);
+        }
+
+        /* Desktop Navigation */
+        .nav-desktop {
             display: flex;
             gap: 30px;
         }
 
-        nav a {
+        .nav-desktop a {
             color: white;
             text-decoration: none;
             font-size: 18px;
-            transition: color 0.3s;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        nav a:hover {
-            color: #cccccc;
+        .nav-desktop a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-desktop a:hover::before {
+            left: 100%;
+        }
+
+        .nav-desktop a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-desktop a.active {
+            background-color: white;
+            color: black;
+        }
+
+        /* Mobile Navigation */
+        .nav-mobile {
+            display: none;
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        .nav-mobile {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            transform: translateY(-100%);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .nav-mobile.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .nav-mobile a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 500;
+            padding: 20px;
+            border-bottom: 1px solid #333;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .nav-mobile a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(10px);
+        }
+
+        .nav-mobile a.active {
+            background-color: white;
+            color: black;
         }
 
         main {
@@ -59,193 +176,506 @@
         }
 
         .tickets-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 40px;
+            padding: 2rem;
             max-width: 500px;
             width: 100%;
+            margin: 0 auto;
         }
 
         h1 {
-            font-size: 32px;
-            margin-bottom: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
             text-align: center;
+            color: #fff;
+        }
+
+        /* Sold Out Banner Styles */
+        .sold-out-banner {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            border: 2px solid #ef4444;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
+            animation: pulse-glow 2s infinite;
+        }
+
+        .sold-out-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .sold-out-subtitle {
+            font-size: 1.2rem;
+            color: #fca5a5;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .sold-out-message {
+            font-size: 1rem;
+            color: #fed7d7;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .event-details {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .event-details h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #fff;
+            text-align: center;
+        }
+
+        .event-details p {
+            margin-bottom: 0.75rem;
+            color: #ccc;
+            font-size: 1.1rem;
+        }
+
+        .event-details p:last-child {
+            margin-bottom: 0;
         }
 
         .ticket-form {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            width: 100%;
+            margin-bottom: 2rem;
+            opacity: 0.4;
+            pointer-events: none;
         }
 
         .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            margin-bottom: 1.5rem;
         }
 
         label {
-            font-size: 16px;
+            display: block;
             font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #fff;
         }
 
         input {
-            padding: 12px;
-            font-size: 16px;
-            border: none;
-            border-radius: 6px;
-            background-color: #3a3a3a;
-            color: white;
+            width: 100%;
+            padding: 0.75rem;
+            background: #333;
+            color: #fff;
+            border: 1px solid #666;
+            font-size: 1rem;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
 
         input:focus {
-            outline: 2px solid white;
-            background-color: #4a4a4a;
+            outline: none;
+            border-color: #fff;
+        }
+
+        input::placeholder {
+            color: #999;
+        }
+
+        /* Date input specific styling */
+        .date-inputs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .date-inputs select {
+            flex: 1;
+            padding: 0.75rem;
+            background: #333;
+            color: #fff;
+            border: 1px solid #666;
+            font-size: 1rem;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .date-inputs select:focus {
+            outline: none;
+            border-color: #fff;
+        }
+
+        .date-inputs select option {
+            background: #333;
+            color: #fff;
+        }
+
+        @media (max-width: 480px) {
+            .date-inputs {
+                flex-direction: column;
+                gap: 8px;
+            }
         }
 
         .generate-button {
-            background-color: white;
-            color: black;
-            padding: 15px 30px;
-            font-size: 18px;
+            width: 100%;
+            background: #666;
+            color: #999;
+            padding: 1rem;
             font-weight: bold;
-            border: 2px solid white;
-            border-radius: 8px;
-            cursor: pointer;
+            font-size: 1.1rem;
+            border: none;
+            cursor: not-allowed;
             transition: all 0.3s ease;
+            border-radius: 4px;
+            opacity: 0.5;
         }
 
         .generate-button:hover {
-            background-color: black;
-            color: white;
-            border: 2px solid white;
+            background: #666;
+            color: #999;
+        }
+
+        .generate-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .logos {
+            margin-top: 3rem;
             display: flex;
-            gap: 30px;
-            margin-top: 20px;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
         }
 
         .logo-img {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            transition: transform 0.3s ease;
+            height: 4.5rem;
+            width: auto;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            border-radius: 8px;
         }
 
         .logo-img:hover {
+            opacity: 1;
             transform: scale(1.1);
         }
 
-        footer {
-            background-color: #000000;
-            padding: 20px;
+        .loading-message {
+            display: none;
             text-align: center;
+            margin-top: 2rem;
+            color: #fff;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            border: 2px solid #666;
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            margin-top: 2rem;
+            color: #fff;
+        }
+
+        .success-message h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .success-message p {
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .download-btn {
+            background: #fff;
+            color: #000;
+            padding: 0.75rem 2rem;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .download-btn:hover {
+            background: #ccc;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: 15px 20px;
+            }
+
+            .nav-desktop {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-mobile {
+                display: block;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .sold-out-title {
+                font-size: 2rem;
+                letter-spacing: 2px;
+            }
+
+            .sold-out-subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 12px 15px;
+            }
+
+            .logo {
+                font-size: 18px;
+                letter-spacing: 1px;
+            }
+
+            .nav-mobile a {
+                padding: 15px;
+                font-size: 16px;
+            }
+
+            .sold-out-title {
+                font-size: 1.75rem;
+                letter-spacing: 1px;
+            }
+
+            .sold-out-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .sold-out-banner {
+                padding: 1.5rem;
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Glow effect for logo */
+        @keyframes glow {
+            0%, 100% {
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        /* Pulse glow effect for sold out banner */
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
+            }
+            50% {
+                box-shadow: 0 15px 35px rgba(220, 38, 38, 0.5);
+            }
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="logo">Underground Lair</div>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="tickets.html">Tickets</a>
+        <a href="index.html" class="logo">UNDERGROUND LAIR</a>
+        
+        <!-- Desktop Navigation -->
+        <nav class="nav-desktop">
+            <a href="tickets.html" class="active">TICKETS</a>
+        </nav>
+
+        <!-- Mobile Menu Toggle -->
+        <div class="menu-toggle" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <nav class="nav-mobile" id="mobileNav">
+            <a href="tickets.html" class="active">TICKETS</a>
         </nav>
     </header>
 
     <main>
         <div class="tickets-content">
-            <h1>Generate Your Ticket</h1>
+            <h1>TICKET GENERATOR</h1>
             
-            <form id="ticketForm" class="ticket-form">
+            <!-- Sold Out Banner -->
+            <div class="sold-out-banner">
+                <div class="sold-out-title">SOLD OUT</div>
+                <div class="sold-out-subtitle">At Full Capacity</div>
+                <div class="sold-out-message">
+                    Thank you for the incredible response! We've reached maximum capacity for this free event.
+                    <br><br>
+                    Stay connected with us for future events and announcements.
+                </div>
+            </div>
+
+            <!-- Event Details -->
+            <div class="event-details">
+                <h2>EVENT DETAILS</h2>
+                <p><strong>Date:</strong> 27th September 2025</p>
+                <p><strong>Venue:</strong> The Unit, Pye Bridge Industrial Estate, Derby</p>
+                <p><strong>Time:</strong> Doors Open 8:00 PM</p>
+                <p><strong>Age Requirement:</strong> 18+ Only</p>
+            </div>
+            
+            <!-- Disabled Form -->
+            <form class="ticket-form" id="ticketForm">
                 <div class="form-group">
-                    <label for="name">Enter Name:</label>
-                    <input type="text" id="name" name="name" required>
+                    <label for="name">NAME</label>
+                    <input type="text" id="name" name="name" disabled placeholder="Event at capacity">
                 </div>
                 
                 <div class="form-group">
-                    <label for="email">Enter Email Address:</label>
-                    <input type="email" id="email" name="email" required>
+                    <label for="email">EMAIL</label>
+                    <input type="email" id="email" name="email" disabled placeholder="Event at capacity">
                 </div>
                 
-                <button type="submit" class="generate-button">Generate Ticket</button>
+                <div class="form-group">
+                    <label for="dateOfBirth">DATE OF BIRTH</label>
+                    <div class="date-inputs">
+                        <select id="dobDay" name="dobDay" disabled>
+                            <option value="">Day</option>
+                        </select>
+                        <select id="dobMonth" name="dobMonth" disabled>
+                            <option value="">Month</option>
+                        </select>
+                        <select id="dobYear" name="dobYear" disabled>
+                            <option value="">Year</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="dateOfBirth" name="dateOfBirth">
+                </div>
+                
+                <button type="button" class="generate-button" disabled>
+                    TICKETS UNAVAILABLE
+                </button>
             </form>
             
-            <div class="logos">
-               <img src="public/rig1.webp" alt="Rig 1" class="logo-img">
-<img src="public/rig2.webp" alt="Rig 2" class="logo-img">
-<img src="public/rig3.webp" alt="Rig 3" class="logo-img"> 
+            <div class="logos" id="logosSection">
+                <img src="public/rig1.webp" alt="Rig 1" class="logo-img" style="height: 8rem;">
+                <img src="public/rig2.webp" alt="Rig 2" class="logo-img" style="height: 10rem;">
+                <img src="public/rig3.webp" alt="Rig 3" class="logo-img" style="height: 9rem;">
+            </div>
+
+            <div class="loading-message" id="loadingMessage">
+                <div class="spinner"></div>
+                <p>Generating your ticket...</p>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                <h2>ACCESS GRANTED!</h2>
+                <p>Your ticket number: <span id="ticketNumber" style="font-weight: bold;"></span></p>
+                <p id="emailStatus" style="color: #ccc; font-size: 0.9rem;"></p>
+                <button id="downloadBtn" class="download-btn">
+                    DOWNLOAD TICKET
+                </button>
             </div>
         </div>
     </main>
 
-    <footer>
-        <p>&copy; 2025 Underground Lair. All rights reserved.</p>
-    </footer>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        document.getElementById('ticketForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        function toggleMobileMenu() {
+            const toggle = document.querySelector('.menu-toggle');
+            const mobileNav = document.getElementById('mobileNav');
             
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
+            toggle.classList.toggle('active');
+            mobileNav.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const header = document.querySelector('header');
+            const toggle = document.querySelector('.menu-toggle');
+            const mobileNav = document.getElementById('mobileNav');
             
-            if (name && email) {
-                generatePDF(name, email);
+            if (!header.contains(event.target)) {
+                toggle.classList.remove('active');
+                mobileNav.classList.remove('active');
             }
         });
-        
-        function generatePDF(name, email) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+
+        // Close mobile menu when window is resized to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                const toggle = document.querySelector('.menu-toggle');
+                const mobileNav = document.getElementById('mobileNav');
+                toggle.classList.remove('active');
+                mobileNav.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Populate dropdowns for visual consistency (even though disabled)
+            const yearSelect = document.getElementById('dobYear');
+            const daySelect = document.getElementById('dobDay');
             
-            // Set background to black
-            doc.setFillColor(0, 0, 0);
-            doc.rect(0, 0, 210, 297, 'F');
+            // Add years from 1900 to 2007 (18+ requirement)
+            for (let year = 2007; year >= 1900; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            }
             
-            // Set text color to white
-            doc.setTextColor(255, 255, 255);
-            
-            // Title
-            doc.setFontSize(24);
-            doc.setFont(undefined, 'bold');
-            doc.text('UNDERGROUND LAIR', 105, 40, { align: 'center' });
-            
-            doc.setFontSize(18);
-            doc.text('ENTRY TICKET', 105, 55, { align: 'center' });
-            
-            // Ticket details
-            doc.setFontSize(14);
-            doc.setFont(undefined, 'normal');
-            
-            const ticketId = Math.random().toString(36).substr(2, 9).toUpperCase();
-            const date = new Date().toLocaleDateString();
-            
-            doc.text(`Name: ${name}`, 30, 90);
-            doc.text(`Email: ${email}`, 30, 110);
-            doc.text(`Date: ${date}`, 30, 130);
-            doc.text(`Ticket ID: ${ticketId}`, 30, 150);
-            
-            // Instructions
-            doc.setFontSize(12);
-            doc.text('This ticket grants you access to the Underground Lair.', 30, 180);
-            doc.text('Present this ticket at the entrance.', 30, 195);
-            
-            // Add border
-            doc.setDrawColor(255, 255, 255);
-            doc.setLineWidth(2);
-            doc.rect(20, 20, 170, 250);
-            
-            // Save the PDF
-            const filename = `underground-lair-ticket-${name.replace(/\s+/g, '-').toLowerCase()}.pdf`;
-            doc.save(filename);
-            
-            alert('PDF ticket generated and downloaded!');
-        }
+            // Populate day dropdown
+            for (let day = 1; day <= 31; day++) {
+                const option = document.createElement('option');
+                option.value = day.toString().padStart(2, '0');
+                option.textContent = day;
+                daySelect.appendChild(option);
+            }
+
+            // Prevent any form submission
+            const form = document.getElementById('ticketForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    alert('Sorry, this event has reached full capacity. No more tickets are available.');
+                    return false;
+                });
+            }
+
+            // Disable all form elements
+            const formElements = document.querySelectorAll('#ticketForm input, #ticketForm select, #ticketForm button');
+            formElements.forEach(element => {
+                element.disabled = true;
+            });
+        });
     </script>
 </body>
 </html>

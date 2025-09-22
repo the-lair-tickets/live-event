@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Underground Lair</title>
+    <title>Underground Lair - Home</title>
+    <link rel="icon" type="image/x-icon" href="public/favicon.ico">
     <style>
         * {
             margin: 0;
@@ -24,29 +25,144 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 40px;
+            padding: 15px 20px;
             background-color: #000000;
+            position: relative;
+            z-index: 100;
         }
 
         .logo {
-            font-size: 24px;
+            font-size: clamp(18px, 4vw, 28px);
             font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
         }
 
-        nav {
+        .logo:hover {
+            animation: glow 2s infinite;
+            transform: scale(1.05);
+        }
+
+        /* Desktop Navigation */
+        .nav-desktop {
             display: flex;
             gap: 30px;
         }
 
-        nav a {
+        .nav-desktop a {
             color: white;
             text-decoration: none;
             font-size: 18px;
-            transition: color 0.3s;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        nav a:hover {
-            color: #cccccc;
+        .nav-desktop a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-desktop a:hover::before {
+            left: 100%;
+        }
+
+        .nav-desktop a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-desktop a.active {
+            background-color: white;
+            color: black;
+        }
+
+        /* Mobile Navigation */
+        .nav-mobile {
+            display: none;
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        .nav-mobile {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            transform: translateY(-100%);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .nav-mobile.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .nav-mobile a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 500;
+            padding: 20px;
+            border-bottom: 1px solid #333;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .nav-mobile a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(10px);
+        }
+
+        .nav-mobile a.active {
+            background-color: white;
+            color: black;
         }
 
         main {
@@ -54,21 +170,94 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
+            justify-content: flex-start;
+            padding: 0px 20px 40px;
         }
 
         .home-content {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 40px;
+            gap: 15px;
+            margin-top: clamp(-40px, -10vw, -80px);
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
         }
 
+        /* Countdown Timer Styles */
+        .countdown-container {
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+
+        .countdown-title {
+            font-size: clamp(16px, 3vw, 20px);
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .time-unit {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 11px 7px;
+            text-align: center;
+            min-width: 52px;
+            transition: all 0.3s ease;
+        }
+
+        .time-unit:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .time-value {
+            font-size: clamp(15px, 3vw, 21px);
+            font-weight: bold;
+            color: white;
+            display: block;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .time-label {
+            font-size: clamp(10px, 2vw, 12px);
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+        .tickets-image {
+            max-width: min(80vw, 400px);
+            width: 100%;
+            height: auto;
+            margin: 20px 0 0 0;
+            border-radius: 8px;
+            display: block;
+        }   
+
         .main-image {
-            max-width: 100%;
+            max-width: min(90vw, 750px);
             height: auto;
             border-radius: 10px;
+            width: 100%;
+            border: none;
+            outline: none;
+            margin-top: 20px;
         }
 
         .enter-button {
@@ -76,44 +265,256 @@
             color: black;
             padding: 15px 30px;
             text-decoration: none;
-            font-size: 20px;
+            font-size: clamp(16px, 3vw, 20px);
             font-weight: bold;
             border-radius: 8px;
             transition: all 0.3s ease;
             border: 2px solid white;
+            position: absolute;
+            top: 110%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            white-space: nowrap;
         }
 
         .enter-button:hover {
             background-color: black;
             color: white;
             border: 2px solid white;
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
         }
 
-        footer {
-            background-color: #000000;
-            padding: 20px;
-            text-align: center;
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: 15px 20px;
+            }
+
+            .nav-desktop {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-mobile {
+                display: block;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .home-content {
+                margin-top: 20px;
+            }
+
+            .countdown-container {
+                margin-bottom: 15px;
+            }
+
+            .countdown {
+                gap: 10px;
+            }
+
+            .time-unit {
+                min-width: 45px;
+                padding: 9px 6px;
+            }
+
+            .main-image {
+                max-width: 95vw;
+            }
+
+            .enter-button {
+                position: static;
+                transform: none;
+                margin-top: 20px;
+                padding: 12px 25px;
+                font-size: 18px;
+            }
+
+            .enter-button:hover {
+                transform: scale(1.05);
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 12px 15px;
+            }
+
+            .logo {
+                font-size: 18px;
+                letter-spacing: 1px;
+            }
+
+            .nav-mobile a {
+                padding: 15px;
+                font-size: 16px;
+            }
+
+            .countdown-container {
+                margin-bottom: 12px;
+            }
+
+            .countdown {
+                gap: 8px;
+            }
+
+            .time-unit {
+                min-width: 41px;
+                padding: 7px 4px;
+            }
+
+            .enter-button {
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+        }
+
+        /* Loading animation for smooth transitions */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .home-content {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        /* Glow effect for logo */
+        @keyframes glow {
+            0%, 100% {
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+            }
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="logo">Underground Lair</div>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="tickets.html">Tickets</a>
+        <a href="index.html" class="logo">UNDERGROUND LAIR</a>
+        
+        <!-- Desktop Navigation -->
+        <nav class="nav-desktop">
+            <a href="tickets.html">TICKETS</a>
+        </nav>
+
+        <!-- Mobile Menu Toggle -->
+        <div class="menu-toggle" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <nav class="nav-mobile" id="mobileNav">
+            <a href="tickets.html">TICKETS</a>
         </nav>
     </header>
 
     <main>
         <div class="home-content">
-          <img src="public/mainpic.webp" alt="Underground Lair" class="main-image">  
-            <a href="tickets.html" class="enter-button">Click to Enter</a>
+            <!-- Countdown Timer -->
+            <div class="countdown-container">
+                <h2 class="countdown-title">EVENT STARTS IN:</h2>
+                <div class="countdown" id="countdown">
+                    <div class="time-unit">
+                        <span class="time-value" id="days">00</span>
+                        <span class="time-label">Days</span>
+                    </div>
+                    <div class="time-unit">
+                        <span class="time-value" id="hours">00</span>
+                        <span class="time-label">Hours</span>
+                    </div>
+                    <div class="time-unit">
+                        <span class="time-value" id="minutes">00</span>
+                        <span class="time-label">Minutes</span>
+                    </div>
+                    <div class="time-unit">
+                        <span class="time-value" id="seconds">00</span>
+                        <span class="time-label">Seconds</span>
+                    </div>
+                </div>
+            </div>
+            
+        <img src="public/tickets.webp" alt="Tickets" class="tickets-image">
+         <img src="public/mainpic.webp" alt="Underground Lair" class="main-image">
+            <a href="tickets.html" class="enter-button">Enter Here </a>
         </div>
     </main>
 
-    <footer>
-        <p>&copy; 2025 Underground Lair. All rights reserved.</p>
-    </footer>
+    <script>
+        function updateCountdown() {
+            // Set the event date to September 27, 2025
+            const eventDate = new Date('September 27, 2025 00:00:00').getTime();
+            const now = new Date().getTime();
+            const timeLeft = eventDate - now;
+            
+            // Calculate time units
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            
+            // Update the display
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            
+            // Check if countdown has ended
+            if (timeLeft < 0) {
+                document.getElementById('countdown').innerHTML = '<div class="time-unit"><span class="time-value">EVENT STARTED!</span></div>';
+            }
+        }
+        
+        // Update countdown every second
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        function toggleMobileMenu() {
+            const toggle = document.querySelector('.menu-toggle');
+            const mobileNav = document.getElementById('mobileNav');
+            
+            toggle.classList.toggle('active');
+            mobileNav.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const header = document.querySelector('header');
+            const toggle = document.querySelector('.menu-toggle');
+            const mobileNav = document.getElementById('mobileNav');
+            
+            if (!header.contains(event.target)) {
+                toggle.classList.remove('active');
+                mobileNav.classList.remove('active');
+            }
+        });
+
+        // Close mobile menu when window is resized to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                const toggle = document.querySelector('.menu-toggle');
+                const mobileNav = document.getElementById('mobileNav');
+                toggle.classList.remove('active');
+                mobileNav.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>
